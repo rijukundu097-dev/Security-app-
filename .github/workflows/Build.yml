@@ -25,7 +25,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp sentinel/app/build/outputs/apk/release/app-release.apk Sentinel.apk
+          ls -la sentinel/app/build/outputs/apk/release/
+          APK=$(ls sentinel/app/build/outputs/apk/release/*.apk | head -1)
+          case "$APK" in
+            *unsigned*) echo "APK is unsigned - old sentinel.zip is still in the repo"; exit 1;;
+          esac
+          cp "$APK" Sentinel.apk
           gh release create v0.1.${{ github.run_number }} Sentinel.apk \
             --title "Sentinel build ${{ github.run_number }}" \
             --notes "Sentinel Antivirus APK"
